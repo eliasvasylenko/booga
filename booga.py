@@ -3,6 +3,7 @@ from pyglet.window import key
 from pyglet.window import mouse
 import esper
 import player
+import phys
 
 print('Hello, Lindsey!')
 
@@ -10,6 +11,7 @@ window = pyglet.window.Window()
 image = pyglet.resource.image('kitten.png')
 
 world = esper.World()
+world.add_processor(phys.PhysicalProcessor())
 
 player.create_player(world, 100, 100)
 

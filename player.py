@@ -1,5 +1,5 @@
-import geom
+import phys
 
 def create_player(world, x, y):
-    world.create_entity(geom.Position(x, y),
-                        geom.Velocity(0, 0))
+    world.create_entity(phys.Position(x, y),
+                        phys.Velocity(0, 0))
