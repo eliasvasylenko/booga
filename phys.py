@@ -1,5 +1,9 @@
 import esper
 
+class Age:
+    def __init__(self):
+        self.age = 0
+
 class Position:
     def __init__(self, x, y):
         self.x = x
@@ -39,3 +43,5 @@ class PhysicalProcessor(esper.Processor):
             ang_vel.a += ang_acc.a
         for ent, (vel, pos) in self.world.get_components(AngularVelocity, Angle):
             ang.a += ang_vel.a
+        for ent, (age) in self.world.get_components(Age):
+            age.age++

@@ -1,19 +1,20 @@
-import pyglet
-from pyglet.window import key
-from pyglet.window import mouse
-import esper
-import player
-import phys
+from pyglet import window, app, resource
+from pyglet.window import key, mouse, Window
+
+from esper import World
+from player import create_player
+from phys import PhysicalProcessor
+from expr import Expression, Prop
 
 print('Hello, Lindsey!')
 
-window = pyglet.window.Window()
-image = pyglet.resource.image('kitten.png')
+window = Window()
+image = resource.image('kitten.png')
 
-world = esper.World()
-world.add_processor(phys.PhysicalProcessor())
+world = World()
+world.add_processor(PhysicalProcessor())
 
-player.create_player(world, 100, 100)
+create_player(world, 100, 100)
 
 @window.event
 def on_draw():
@@ -33,4 +34,29 @@ def on_mouse_press(x, y, button, modifiers):
     if button == mouse.LEFT:
         print(f'The left mouse button was pressed. ({x}, {y})')
 
-pyglet.app.run()
+app.run()
+
+
+
+class Add(Expression):
+    def _eval(self, *addends):
+        print('adding!')
+        return sum(addends)
+
+
+one = Prop(10)
+
+two = Prop(7)
+
+three = Prop(31)
+
+add = Add(one, two, three)
+
+print(add.eval())
+print(add.eval())
+
+two.mod(11)
+
+print(add.eval())
+print(add.eval())
+
