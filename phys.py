@@ -44,4 +44,4 @@ class PhysicalProcessor(esper.Processor):
         for ent, (vel, pos) in self.world.get_components(AngularVelocity, Angle):
             ang.a += ang_vel.a
         for ent, (age) in self.world.get_components(Age):
-            age.age++
+            age.age += 1

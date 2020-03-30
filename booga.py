@@ -5,14 +5,15 @@ from esper import World
 from player import create_player
 from phys import PhysicalProcessor
 from expr import Expression, Prop
+from graph import Mesh, Meshes, Camera, GraphicsProcessor
 
 print('Hello, Lindsey!')
 
 window = Window()
-image = resource.image('kitten.png')
 
 world = World()
 world.add_processor(PhysicalProcessor())
+world.add_processor(GraphicsProcessor())
 
 create_player(world, 100, 100)
 
