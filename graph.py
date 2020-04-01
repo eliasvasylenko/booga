@@ -22,6 +22,10 @@ class Camera:
         self.depth = depth
         self.proj = proj
 
+class VertexBuffers:
+    def __init__(self):
+        self.vbos = []
+
 class GraphicsProcessor(esper.Processor):
     def process(self):
         for ent, (trans, pos, ang) in self.world.get_components(Transformation, Position, Angle):
@@ -33,7 +37,11 @@ class GraphicsProcessor(esper.Processor):
                                      [0, 0, 0, 1]],
                                     dtype=np.float32)
             trans.matrix = np.linalg.inv(trans.matrix)
- 
+
+        buff = GLuint()
+        glGenBuffers(1, ctypes.pointer(buff))
+        print(f'buff bro {buff}')
+        glDeleteBuffers(1, ctypes.pointer(buff))
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
         glMultMatrixf(np_matrix_to_c_array(
