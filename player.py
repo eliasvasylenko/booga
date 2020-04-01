@@ -7,6 +7,7 @@ def create_player(world, x, y):
         phys.Position(x, y),
         phys.Velocity(0, 0),
         phys.Angle(0),
+        graph.Transformation(),
         graph.Meshes(graph.Mesh(
             pyglet.graphics.vertex_list(3,
                 ('v2i', (-10, -10, 0, 20, 10, -10))),

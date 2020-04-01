@@ -15,7 +15,10 @@ world = World()
 world.add_processor(PhysicalProcessor())
 world.add_processor(GraphicsProcessor())
 
-create_player(world, 100, 100)
+create_player(world, 1, 1)
+create_player(world, -10, 10)
+create_player(world, -10, -10)
+create_player(world, 10, -10)
 
 @window.event
 def on_draw():

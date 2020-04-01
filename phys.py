@@ -45,3 +45,4 @@ class PhysicalProcessor(esper.Processor):
             ang.a += ang_vel.a
         for ent, (age) in self.world.get_components(Age):
             age.age += 1
+
