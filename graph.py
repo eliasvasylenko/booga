@@ -1,7 +1,7 @@
 import esper
 from phys import Position, Angle
 import numpy as np
-from pyglet.gl import *
+from OpenGL.GL import *
 import ctypes
 
 class Transformation:
@@ -40,7 +40,6 @@ class GraphicsProcessor(esper.Processor):
 
         buff = GLuint()
         glGenBuffers(1, ctypes.pointer(buff))
-        print(f'buff bro {buff}')
         glDeleteBuffers(1, ctypes.pointer(buff))
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
