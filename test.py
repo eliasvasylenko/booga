@@ -32,13 +32,14 @@ class Game:
     def _init_video(self):
         SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1)
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4)
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 5)
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2)
         SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1)
         SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24)
 
         self._maincontext = SDL_GL_CreateContext(self._window)
         if (self._maincontext == None):
-            raise Exception('Failed to create OpenGL context')
+            error = SDL_GetError()
+            raise Exception(f'Failed to create OpenGL context {error}')
 
         SDL_GL_SetSwapInterval(1)
 
@@ -58,6 +59,9 @@ class Game:
 
 game = Game()
 
-SDL_Delay(1000)
+while (!quit):
+    while (SDL_PollEvent(&e) != 0):
+        if (e.type == SDL_QUIT):
+            quit = true
 
 game.quit()
