@@ -5,6 +5,7 @@ import ctypes
 from expr import Expression, Prop
 from enum import Enum
 from threading import Lock
+from mainmenu import MainMenu
 
 class Game:
     def __init__(self):
@@ -16,8 +17,10 @@ class Game:
         self._init_video()
 
         self._init_joysticks()
+
+        self._channels = []
     
-    def _quit(self):
+    def quit(self):
         SDL_DestroyWindow(self._window)
         SDL_Quit()
 
@@ -83,16 +86,15 @@ class Game:
 
     def _init_joysticks(self):
         js = joystick.SDL_NumJoysticks()
-        print(f'Joy! {js}')
 
-    def start(self):
-        running = True
+    def open_channel(self, channel):
+        channel.running = True
         event = SDL_Event()
 
-        while running:
+        while channel.is_running():
             while SDL_PollEvent(ctypes.byref(event)) != 0:
                 if event.type == SDL_QUIT:
-                    running = False
+                    channel.close()
                 elif event.type == SDL_WINDOWEVENT:
                     self._on_window_event(event.window)
                 elif event.type == SDL_KEYDOWN:
@@ -101,8 +103,7 @@ class Game:
                     self._on_key_up_event(event.key)
     
             self._render()
-
-        self._quit()
+            channel.process()
 
     def _render(self):
         glClearColor(0, 0.5, 1, 0)
@@ -116,4 +117,9 @@ class Game:
     def _on_key_up_event(self, key):
         pass
 
-Game().start()
+    def _peek_channel(self):
+        pass
+
+game = Game()
+game.open_channel(MainMenu())
+game.quit()
