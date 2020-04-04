@@ -7,7 +7,7 @@ from expr import Expression, Prop
 class Game:
     def __init__(self):
         init = SDL_Init(SDL_INIT_EVERYTHING)
-        if (init != 0):
+        if init != 0:
             error = SDL_GetError()
             raise Exception(f'SDL_Init failed {error}')
 
@@ -15,7 +15,7 @@ class Game:
             b'Hello, Lindsey!',
             SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
             0, 0, SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_OPENGL)
-        if (self._window == None):
+        if self._window == None:
             error = SDL_GetError()
             raise Exception(f'SDL_CreateWindow failed {error}')
 
@@ -37,7 +37,7 @@ class Game:
         SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24)
 
         self._maincontext = SDL_GL_CreateContext(self._window)
-        if (self._maincontext == None):
+        if self._maincontext == None:
             error = SDL_GetError()
             raise Exception(f'Failed to create OpenGL context {error}')
 
@@ -57,11 +57,30 @@ class Game:
         js = joystick.SDL_NumJoysticks()
         print(f'Joy! {js}')
 
-game = Game()
+    def start(self):
+        running = True
+        event = SDL_Event()
 
-while (!quit):
-    while (SDL_PollEvent(&e) != 0):
-        if (e.type == SDL_QUIT):
-            quit = true
+        while running:
+            while SDL_PollEvent(ctypes.byref(event)) != 0:
+                if event.type == SDL_QUIT:
+                    running = False
+                elif event.type == SDL_WINDOWEVENT:
+                    self._on_window_event(event.window)
+                elif event.type == SDL_KEYDOWN:
+                    self._on_key_down_event(event.key)
+                elif event.type == SDL_KEYUP:
+                    self._on_key_up_event(event.key)
 
-game.quit()
+        self.quit()
+
+    def _on_window_event(self, window):
+        pass
+
+    def _on_key_down_event(self, key):
+        pass
+
+    def _on_key_up_event(self, key):
+        pass
+
+Game().start()
