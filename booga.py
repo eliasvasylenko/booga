@@ -8,9 +8,15 @@ from phys import PhysicalProcessor
 from expr import Expression, Prop
 from graph import Mesh, Meshes, Camera, GraphicsProcessor
 
-ext.init()
-window = Window("Hello, Lindsey!", size=(640, 480))
-window.show()
+if (sdl2.SDL_Init(sdl2.SDL_INIT_VIDEO) != 0):
+    error = sdl2.SDL_GetError()
+    print(f'SDL_Init failed {error}')
+
+window = sdl2.SDL_CreateWindow(
+    b'Hello, Lindsey!',
+    sdl2.SDL_WINDOWPOS_UNDEFINED, sdl2.SDL_WINDOWPOS_UNDEFINED,
+    640, 480, 0)
+sdl2.SDL_ShowWindow(window)
 
 world = World()
 world.add_processor(PhysicalProcessor())
@@ -29,7 +35,6 @@ while running:
             running = False
             break
     world.process()
-    window.refresh()
 
 js = sdl2.joystick.SDL_NumJoysticks()
 print(f'Joy! {js}')
@@ -56,4 +61,5 @@ two.mod(11)
 print(add.eval())
 print(add.eval())
 
-ext.quit()
+sdl2.SDL_DestroyWindow(window)
+sdl2.SDL_Quit()
