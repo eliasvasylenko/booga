@@ -4,10 +4,8 @@ from OpenGL.GL import *
 import ctypes
 from expr import Expression, Prop
 from enum import Enum
-from threading import Lock
-from mainmenu import MainMenu
 
-class Game:
+class Engine:
     def __init__(self):
         init = SDL_Init(SDL_INIT_EVERYTHING)
         if init != 0:
@@ -17,8 +15,6 @@ class Game:
         self._init_video()
 
         self._init_joysticks()
-
-        self._channels = []
     
     def quit(self):
         SDL_DestroyWindow(self._window)
@@ -53,7 +49,7 @@ class Game:
 
         SDL_GL_SetSwapInterval(1)
 
-    def _on_window_event(self, window):
+    def _on_window_event(self, scene, window):
         self._refresh_window()
 
     def _set_fullscreen_real(self):
@@ -87,39 +83,49 @@ class Game:
     def _init_joysticks(self):
         js = joystick.SDL_NumJoysticks()
 
-    def open_channel(self, channel):
-        channel.running = True
+    def open_scene(self, scene):
         event = SDL_Event()
 
-        while channel.is_running():
+        while not scene is None:
             while SDL_PollEvent(ctypes.byref(event)) != 0:
                 if event.type == SDL_QUIT:
-                    channel.close()
+                    scene.quit()
                 elif event.type == SDL_WINDOWEVENT:
-                    self._on_window_event(event.window)
+                    self._on_window_event(scene, event.window)
                 elif event.type == SDL_KEYDOWN:
-                    self._on_key_down_event(event.key)
+                    self._on_key_down_event(scene, event.key)
                 elif event.type == SDL_KEYUP:
-                    self._on_key_up_event(event.key)
+                    self._on_key_up_event(scene, event.key)
     
-            self._render()
-            channel.process()
+            scene.process()
+            SDL_GL_SwapWindow(self._window)
 
-    def _render(self):
-        glClearColor(0, 0.5, 1, 0)
-        glClear(GL_COLOR_BUFFER_BIT)
-        SDL_GL_SwapWindow(self._window)
+            if scene.has_next_scene():
+                scene = scene.next_scene()
 
-    def _on_key_down_event(self, key):
+    def _on_key_down_event(self, scene, key):
         if key.keysym.sym == SDLK_F11:
             self._toggle_fullscreen()
+        elif key.keysym.sym == SDLK_ESCAPE:
+            scene.back()
 
-    def _on_key_up_event(self, key):
+    def _on_key_up_event(self, scene, key):
         pass
 
     def _peek_channel(self):
         pass
 
-game = Game()
-game.open_channel(MainMenu())
-game.quit()
+class Scene:
+    def quit(self):
+        self._next_scene = None
+
+    def back(self):
+        self.quit()
+
+    def has_next_scene(self):
+        return hasattr(self, '_next_scene')
+
+    def next_scene(self):
+        next_scene = self._next_scene
+        del self._next_scene
+        return next_scene
