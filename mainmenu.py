@@ -7,20 +7,27 @@ from OpenGL.arrays import *
 from OpenGL.GL.shaders import *
 
 import numpy
+import math
 
 class MainMenu(Scene):
     def __init__(self):
-        self._vertex_shader = compileShader("""#version 330
-            in vec2 LVertexPos2D;
+        vertex_shader = compileShader("""#version 330
+            in vec2 LVertexPos;
+            uniform mat3 LTransform;
             void main() {
-                gl_Position = vec4( LVertexPos2D.x, LVertexPos2D.y, 0, 1 );
+                vec3 v3 = vec3( LVertexPos, 1 ) * LTransform;
+                gl_Position = vec4( v3[0], v3[1], 0, 1 );
             }""", GL_VERTEX_SHADER)
 
-        self._fragment_shader = compileShader("""#version 330
+        fragment_shader = compileShader("""#version 330
             out vec4 LFragment;
             void main() {
                 LFragment = vec4( 1.0, 1.0, 0.0, 1.0 );
             }""", GL_FRAGMENT_SHADER)
+
+        self._triangle_shader = compileProgram(vertex_shader, fragment_shader)
+        vertex_location = glGetAttribLocation(self._triangle_shader, 'LVertexPos')
+        self._transform = glGetUniformLocation(self._triangle_shader, 'LTransform')
 
         self._triangle = glGenBuffers(1)
         glBindBuffer(GL_ARRAY_BUFFER, self._triangle)
@@ -43,19 +50,16 @@ class MainMenu(Scene):
         self._vao = glGenVertexArrays(1);
         glBindVertexArray(self._vao);
 
-        self._triangle_shader = compileProgram(self._vertex_shader, self._fragment_shader)
-        self._vertex_location = glGetAttribLocation(self._triangle_shader, 'LVertexPos2D')
-
-
         glVertexAttribPointer(
-                self._vertex_location, 2, GL_FLOAT, GL_FALSE,
+                vertex_location, 2, GL_FLOAT, GL_FALSE,
                 2 * ctypes.sizeof(ctypes.c_float), None)
-        glEnableVertexAttribArray(self._vertex_location)
+        glEnableVertexAttribArray(vertex_location)
+
+        self._ang = 0
 
     def __del__(self):
         glDeleteBuffers(1, self._triangle)
-        glDeleteShader(self._vertex_shader)
-        glDeleteShader(self._fragment_shader)
+        glDeleteProgram(self._triangle_shader)
 
     def process(self):
         self._render()
@@ -64,10 +68,15 @@ class MainMenu(Scene):
         glClearColor(0, 0.5, 1, 0)
         glClear(GL_COLOR_BUFFER_BIT)
 
-        glUseProgram(self._triangle_shader)
-        
-        glBindVertexArray(self._vao);
+        self._ang += 0.01
 
+        glUseProgram(self._triangle_shader)
+        glBindVertexArray(self._vao)
+        glUniformMatrix3fv(self._transform, 1, False,
+                numpy.array(
+                    [[math.cos(self._ang), -math.sin(self._ang), 0.4],
+                     [math.sin(self._ang), math.cos(self._ang), 0],
+                     [0, 0, 1]]))
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self._triangle_indices)
         glDrawElements(GL_TRIANGLE_FAN, 4, GL_UNSIGNED_INT, None)
 
