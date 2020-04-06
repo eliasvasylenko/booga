@@ -28,6 +28,10 @@ class MainMenu(Scene):
         self._triangle_shader = compileProgram(vertex_shader, fragment_shader)
         vertex_location = glGetAttribLocation(self._triangle_shader, 'LVertexPos')
         self._transform = glGetUniformLocation(self._triangle_shader, 'LTransform')
+        self._transform123 = glGetUniformLocation(self._triangle_shader, 'LTransformG')
+        self._transform12 = glGetUniformLocation(self._triangle_shader, 'LTransformGifdf')
+        print(f' exists: {self._transform}, does not exist: {self._transform12}')
+        # we can query which attributes are needed! yay!
 
         self._triangle = glGenBuffers(1)
         glBindBuffer(GL_ARRAY_BUFFER, self._triangle)
@@ -71,12 +75,12 @@ class MainMenu(Scene):
         self._ang += 0.01
 
         glUseProgram(self._triangle_shader)
-        glBindVertexArray(self._vao)
         glUniformMatrix3fv(self._transform, 1, False,
                 numpy.array(
                     [[math.cos(self._ang), -math.sin(self._ang), 0.4],
                      [math.sin(self._ang), math.cos(self._ang), 0],
                      [0, 0, 1]]))
+        glBindVertexArray(self._vao)
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self._triangle_indices)
         glDrawElements(GL_TRIANGLE_FAN, 4, GL_UNSIGNED_INT, None)
 

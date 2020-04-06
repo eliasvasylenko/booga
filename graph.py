@@ -57,7 +57,15 @@ class GraphicsProcessor(esper.Processor):
                 glPopMatrix()
 
 def np_matrix_to_c_array(arr):
-    if (not (arr.flags["C_CONTIGUOUS"] or arr.flags["F_CONTIGUOUS"]) or (arr.dtype != np.float32)):
+    if (not (arr.flags["C_CONTIGUOUS"] or
+             arr.flags["F_CONTIGUOUS"]) or
+            (arr.dtype != np.float32)):
         arr = np.ascontiguousarray(arr, dtype=np.float32)
 
     return arr.ctypes.data_as(ctypes.POINTER(ctypes.c_float * arr.size))[0]
+
+# Way to make our engine work for lots of different types of shader ...
+
+# Shaders do not all have to have the same attributes, uniforms, etc. Attributes with the same semantic meaning have the same name, and no set location. So to query what data needs to be put into the shader we just have to query the known attribute/uniform names and see whether they are present. From this we can pull the correct info from the appropriate component! Or we can even select from a set of related shaders based on which components (and therefore which attributes/uniforms) are present. Or we can have default values for some uniforms. Or we can do any number of other things! Material system?
+
+# Definitely not necessary to implement all this out of the gate (or ever) but useful to at least think about how to structure code to allow it to evolve into something more sophisticated if that becomes necessary.
